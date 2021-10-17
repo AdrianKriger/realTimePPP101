@@ -6,7 +6,6 @@
 
 # basic rtklib processing
 
-
 ### todo:
 #       - harvest igs/ngi_trignet reference coord. ~~ rms, standard deviation, etc 
 #       - transform .rctm3 to .nav and .obs (rtkconv) ~~ harvest dop, gdop, etc.
@@ -15,7 +14,6 @@
 from pyproj import Proj
 
 import pandas as pd
-
 
 
 def readposfile(fpos, lat0=None, lng0=None):
@@ -40,8 +38,8 @@ def readposfile(fpos, lat0=None, lng0=None):
     return w
 
 
-#utm34S
-utm34s = "+proj=utm +zone=34 +south +a=6378249.145 +b=6356514.966398753 +towgs84=-134.73,-110.92,-292.66,0,0,0,0 +units=m +no_defs"
+#utm34S - https://epsg.io/32734
+utm34s = "+proj=utm +zone=34 +south +datum=WGS84 +units=m +no_defs"
 
 fpos = 'C:/rtklib_realTime_PPP/sol/cpt_20211017_1344.pos'
 
