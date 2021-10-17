@@ -17,7 +17,7 @@ import pandas as pd
 
 fpos = 'C:/rtklib_realTime_PPP/sol/Cpt_sol_20211016_19.pos'
 
-def readposfile(fpos, lat0=None, lng0=None):
+def readposfile(fpos):
     for sr, l in enumerate(open(fpos)):
         if l[0] != "%":
             break
