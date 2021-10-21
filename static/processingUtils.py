@@ -31,7 +31,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_ylabel('Absolute Error (m)')
     ax.xaxis_date()
     ax.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
-    ax.set_xlabel('Time (s)')
+    ax.set_xlabel('Time (h:m)')
       
     # Make legend
     pyplot.legend(loc='upper left')
@@ -49,7 +49,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_ylabel('Standard Deviation (m)')
     ax.xaxis_date()
     ax.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
-    ax.set_xlabel('Time (s)')
+        ax.set_xlabel('Time (h:m)')
       
     # Make legend
     pyplot.legend(loc='upper left')
