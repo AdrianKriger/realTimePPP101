@@ -7,10 +7,8 @@
 #           - Ruffin: https://github.com/ruffsl/RTKLIB-Tools
 #           - Chen Chao: https://github.com/heiwa0519/PPPLib
 
-
 import math
 import time
-from sklearn.metrics import mean_squared_error
 
 import numpy as np
 import pandas as pd
@@ -19,7 +17,7 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
-from processingUtils import distTime_std_plt
+from processingUtils import d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply
 
 def read_target(cntr, crs):
     
@@ -38,12 +36,13 @@ def read_target(cntr, crs):
     
     return c
 
-def buildDataFrame(posFile, cntr, crs):
+def buildDataFrame(posFile, cntr, crs, jparams):
     pd.options.mode.chained_assignment = None
     
     # build a df with the available data:
     #   - transform lat, lon to x, y in local crs
     #   - add x, y and z difference columns [that is reference minus solution at epoch]
+    #   - rms and std for x, y and z with 2d rms and mrse -> write the text
     
     skiprow = 0
     with open(posFile) as search:
@@ -92,29 +91,21 @@ def buildDataFrame(posFile, cntr, crs):
         df['disty(m)'][i] = k
         df['distx(m)'][i] = l
         df['distz(m)'][i] = m
-        
-    # en = np.empty(1)
-    # enu = np.empty(1)
-    # for i in range(1, df.x.__len__()):
-    #     #enu.append(math.sqrt(df.x[i]*df.x[i]+df.y[i]*df.y[i]+df['height(m)'][i]*df['height(m)'][i]))
-    #     np.append(enu, math.sqrt(df.x[i]*df.x[i]+df.y[i]*df.y[i]+df['height(m)'][i]*df['height(m)'][i]))
-    #     #en.append(math.sqrt(df.x[i]*df.x[i]+df.y[i]*df.y[i]))
-    #     np.append(en, math.sqrt(df.x[i]*df.x[i]+df.y[i]*df.y[i]))
             
-    # [rms_x, std_x] = d2(df.x, cn.x)
-    # [rms_y, std_y] = d2(df.y, cn.y)
-    # [rms_z, std_z] = d2(df['height(m)'], cn.z)
-    # [rms2d, std_rms2d] = get_2drms(en)
-    # [mrse, std_mrse] = get_mrse(enu)
-        
-    # #wr = [rms_x, std_x, rms_y, std_y, rms_z, std_z, rms2d, std_rms2d, mrse, std_mrse]
-        
-    # with open(rmstxt, "w") as file:
-    #     #file.write(str(rms_x))
-    #     file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\n\n\2drms: {}; std_2drms: {}\nmrse: {}, std_mrse" {}'.format(rms_x, std_x,rms_y, std_y, rms_z, 
-    #                                                              std_z, rms2d, std_rms2d,
-    #                                                              mrse, std_mrse))
-    # file.close()
+    [rms_x, std_x] = d2(df.x, cn.x)
+    [rms_y, std_y] = d2(df.y, cn.y)
+    [rms_z, std_z] = d2(df['height(m)'], cn.z)
+    rms2d = get_rms2d(std_x, std_y)
+    mrse = get_mrse(std_x, std_y, std_z)
+                
+    with open(jparams['statistic_txt'], "w") as file:
+        #file.write(str(rms_x))
+        file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
+                                                                                                                     rms_y, std_y, 
+                                                                                                                     rms_z, std_z, 
+                                                                                                                     rms2d,
+                                                                                                                     mrse))
+    file.close()
             
     return df
 
@@ -170,8 +161,10 @@ def plot(df, jparams):
     dd = ['Y','X','Z'] #,'distne','disteu','distun']
     dist = [df['disty(m)'], df['distx(m)'], df['distz(m)']] #,distne,disteu,distun]
 
-    # 2 plots i) distance vs Time ii) std dev vs Time
+    # 2 plots - i) distance vs Time ii) std dev vs Time
     distTime_std_plt(df, sd, dd, dist, time, jparams)
+    # 1 plot - ground track 
+    grnd_track_ply(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
     
 
     
