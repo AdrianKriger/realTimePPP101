@@ -42,6 +42,7 @@ def buildDataFrame(posFile, cntr, crs):
     pd.options.mode.chained_assignment = None
     
     # build a df with the available data:
+    #   - transform lat, lon to x, y in local crs
     #   - add x, y and z difference columns [that is reference minus solution at epoch]
     
     skiprow = 0
