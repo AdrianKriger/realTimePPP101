@@ -17,7 +17,7 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
-from processingUtils import d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply
 
 def read_target(cntr, crs):
     
@@ -41,13 +41,14 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     
     # build a df with the available data:
     #   - transform lat, lon to x, y in local crs
+    #   - add UTC
     #   - add x, y and z difference columns [that is reference minus solution at epoch]
     #   - rms and std for x, y and z with 2d rms and mrse -> write the text
     
     skiprow = 0
     with open(posFile) as search:
         for i, line in enumerate(search):
-            if "%  UTC" in line:
+            if "%  GPST" in line:
                 skiprow = i
                 break
     df = pd.read_csv(posFile, skiprows=skiprow, delim_whitespace=True, parse_dates=[[0, 1]])
@@ -67,11 +68,16 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     df.insert(4, "x", x, True)
     df.insert(5, "y", y, True)
     
-    #df['UTC'] = UTCFromGps(df['%_GPST'].apply(lambda x: x.split(' ')[0]),
-    #                       df['%_GPST'].apply(lambda x: x.split(' ')[1]))
-    
-    #df['UTC'] = df.apply(lambda row: UTCFromGps(row['%_GPST'][:4],
-                                                #row['%_GPST'][4:]), axis = 1)
+    #-- UTC
+    df['Gw'] = df['%_GPST'].apply(lambda x: x.split(' ')[0])
+    df['Gs'] = df['%_GPST'].apply(lambda x: x.split(' ')[1])
+    #df['UTC'] = UTCFromGps(df['Gw'], df['Gs'], leapSecs=14):
+    #print(df['Gs'])
+    UTC = df.apply(lambda row: UTCFromGps(float(row['Gw']), float(row['Gs']), leapSecs=jparams['gps-leapSec']), axis = 1)
+    # df.insert() to add a column
+    df.insert(1, "UTC", UTC, True)
+    # datetime
+    df['UTC'] = pd.to_datetime(df['UTC'])
     
     cn = read_target(cntr, crs)
     reference = Point(cn['x'], cn['y'])
@@ -91,20 +97,28 @@ def buildDataFrame(posFile, cntr, crs, jparams):
         df['disty(m)'][i] = k
         df['distx(m)'][i] = l
         df['distz(m)'][i] = m
+    
+    cn['Rxyz'] = cn['x'] + cn['y'] + cn['z']
+    df['xyz'] = df['x'] + df['y'] + df['height(m)']
             
     [rms_x, std_x] = d2(df.x, cn.x)
     [rms_y, std_y] = d2(df.y, cn.y)
     [rms_z, std_z] = d2(df['height(m)'], cn.z)
+    [rms_3d, std_3d] = d2(df.xyz, cn['Rxyz'])
+    
+    #rms2d = get_2drms(df['distx(m)'], df['disty(m)'])
     rms2d = get_rms2d(std_x, std_y)
-    mrse = get_mrse(std_x, std_y, std_z)
+    #mrse = get_mrse(df['distx(m)'], df['disty(m)'], df['distz(m)'])
+    mrse = get_mrse(rms_x, rms_y, rms_z)
                 
     with open(jparams['statistic_txt'], "w") as file:
         #file.write(str(rms_x))
-        file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
-                                                                                                                     rms_y, std_y, 
-                                                                                                                     rms_z, std_z, 
-                                                                                                                     rms2d,
-                                                                                                                     mrse))
+        file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\
+        \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
+                                                                rms_y, std_y, 
+                                                                rms_z, std_z, 
+                                                                rms_3d, std_3d,
+                                                                rms2d, mrse))
     file.close()
             
     return df
@@ -149,9 +163,9 @@ def plot(df, jparams):
     distmin = df['dist(m)'].min()
     distnorm = mpl.colors.Normalize(vmin=-distmax, vmax=0)
     
-    tdate = df['%_UTC']-df['%_UTC'][0]
+    tdate = df['UTC']-df['UTC'][0]
     # specify a date to use for the times
-    zero = df['%_UTC'][0]
+    zero = df['UTC'][0]
     time = [zero + t for t in tdate]
     # convert datetimes to numbers
     zero = md.date2num(zero)

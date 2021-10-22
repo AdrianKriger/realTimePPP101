@@ -21,22 +21,10 @@ def main():
     cntr = jparams['reference-point']
     crs = jparams['crs']
         
-        
-    # read the .pos and to df
-    df = buildDataFrame(posFile, cntr, crs)
+    # read the .pos to df
+    df = buildDataFrame(posFile, cntr, crs, jparams)
     
     plot(df, jparams)
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

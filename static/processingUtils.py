@@ -8,6 +8,9 @@ from sklearn.metrics import mean_squared_error
 
 import numpy as np
 
+import time
+from datetime import datetime
+
 import matplotlib as mpl
 from matplotlib import pyplot
 import matplotlib.pylab as pl
@@ -46,7 +49,7 @@ def get_mse(measured, target):
 def get_rmse(measured, target):
     
     #
-    # - this function might not be necessary given the one above can do the necessary
+    # - this function might not be necessary given the one above
     #
     
     mse = get_mse(measured, target)
@@ -60,27 +63,50 @@ def d2(df, target):
     rmse = get_rmse(df, target)
     std = get_standard_deviation(df)
     
-    return rmse, std
+    return round(rmse, 4), round(std, 4)
 
-def get_rms2d(std_x, std_y):
+def get_rms2d(rms_x, rms_y):
     
     # Twice the DRMS of the horizontal position errors, defining the radius of a circle centered at the 
     # true position, containing the horizontal position estimate with a probability of 95 %.
     # - https://gnss-sdr.org/design-forces/accuracy/
     
-    drms2 = round(2 * math.sqrt(std_x**2 + std_y**2), 4)
+    drms2 = round(2 * math.sqrt(rms_x**2 + rms_y**2), 4)
 
     return drms2
 
-def get_mrse(std_x, std_y, std_z):
+def get_mrse(rms_x, rms_y, rms_z):
     
     # The radius of a sphere centered at the true position, containing the position estimate in 3D with a 
     # probability of 61 %.
     # - https://gnss-sdr.org/design-forces/accuracy/
     
-    mrse = round(math.sqrt(std_x**2 + std_y**2 + std_z**2), 4)
+    mrse = round(math.sqrt(rms_x**2 + rms_y**2 + rms_z**2), 4)
 
     return mrse
+
+def UTCFromGps(gpsWeek, SOW, leapSecs):
+    
+    secsInWeek = 604800
+    secsInDay = 86400
+    gpsEpoch = (1980, 1, 6, 0, 0, 0)
+    
+    # converts gps week and seconds to UTC
+    # SOW = seconds of week
+    # gpsWeek is the full number (not modulo 1024)
+    
+    secFract = SOW % 1
+    epochTuple = gpsEpoch + (-1, -1, 0) 
+    t0 = time.mktime(epochTuple) - time.timezone  #mktime is localtime, correct for UTC
+    tdiff = (gpsWeek * secsInWeek) + SOW - leapSecs
+    t = t0 + tdiff
+    year, month, day, hh, mm, ss, dayOfWeek, julianDay, daylightsaving = time.gmtime(t)
+    #use gmtime since localtime does not allow to switch off daylighsavings correction!!!
+    
+    time_tuple = (year, month, day, hh, mm, int(ss + secFract))
+    d = datetime(*time_tuple[0:6])
+    
+    return d
 
 def distTime_std_plt(df, sd, dd, dist, time, jparams):
     
@@ -110,7 +136,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     # Make plots
     for i in range(len(sd)):
         #sdx = df[i+8]
-        sdx = df.iloc[:, 8+i]
+        sdx = df.iloc[:, 9+i]
         ax.plot(time, sdx, label=sd[i], color=colors[i]) #tdate
     
     # ax.plot(tdate,dist, label='dist')
@@ -129,7 +155,9 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
 def grnd_track_ply(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams):
     
     fig4 = pyplot.figure(figsize=(18,12), dpi=80)
-    fig4.suptitle('Position and Standard Distribution', fontsize=14, fontweight='bold')
+    fig4.suptitle('Position and Standard Distribution', fontsize=14, fontweight='bold',
+                  horizontalalignment='right', x=0.71, y=0.93,
+                  verticalalignment='top')
     #ax = fig4.add_subplot(111)
     ax = fig4.add_subplot(111,aspect='equal')
     p = ax.scatter(df['disty(m)'], df['distx(m)'], c=-df['dist(m)'], alpha=.5, cmap='jet')

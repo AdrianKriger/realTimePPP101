@@ -1,9 +1,10 @@
 {
-    "input-rtkpos": "./sol/cpt_20211017_1344.pos",
+    "input-rtkpos": "./sol/cpt_20211020_1813.pos",
     
     "crs": "proj=utm +zone=34 +south +datum=WGS84 +units=m +no_defs",
     "reference-point": "./configs_settings/apriori_za_coords.pos",
     
+    "gps-leapSec": 14,
     "statistic_txt": "rms_std.txt",
     
     "distanceTime_std_fig": "./img/Fig01.png",
