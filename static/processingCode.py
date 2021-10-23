@@ -17,7 +17,7 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
-from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply#, move_debug
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug
 
 def read_target(cntr, crs):
     
@@ -178,11 +178,11 @@ def plot(df, jparams):
     # 2 plots - i) distance vs Time ii) std dev vs Time
     distTime_std_plt(df, sd, dd, dist, time, jparams)
     # 1 plot - ground track 
-    grnd_track_ply(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
+    grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
     
-# def move_files(jparams):
+def move_files(jparams):
     
-#     move_debug(jparams)
+    move_debug(jparams)
     
 
 

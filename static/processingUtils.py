@@ -3,6 +3,9 @@
 
 # author: arkriger - https://github.com/AdrianKriger/realTimePPP101
 
+import os
+import shutil
+
 import math
 from sklearn.metrics import mean_squared_error
 
@@ -87,6 +90,11 @@ def get_mrse(rms_x, rms_y, rms_z):
 
 def UTCFromGps(gpsWeek, SOW, leapSecs):
     
+    #-- A Python implementation of GPS related time conversions.
+    #-- Copyright 2002 by Bud P. Bruegger, Sistema, Italy
+    #-- mailto:bud@sistema.it
+    #-- http://www.sistema.it
+    
     secsInWeek = 604800
     secsInDay = 86400
     gpsEpoch = (1980, 1, 6, 0, 0, 0)
@@ -107,6 +115,17 @@ def UTCFromGps(gpsWeek, SOW, leapSecs):
     d = datetime(*time_tuple[0:6])
     
     return d
+
+def move_debug(jparams):
+    fname = jparams['input-rtkpos']
+
+    start = './sol/cpt_'
+    end = '.pos'
+    f = fname[fname.find(start)+len(start):fname.rfind(end)]
+    
+    shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".stat", "./trace_stats/rtknavi_" + f + ".stat")
+    shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".trace", "./trace_stats/rtknavi_" + f + ".trace")
+ 
 
 def distTime_std_plt(df, sd, dd, dist, time, jparams):
     
@@ -152,7 +171,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     # Save figure using 72 dots per inch
     pyplot.savefig(jparams['distanceTime_std_fig'],dpi=72)
     
-def grnd_track_ply(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams):
+def grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams):
     
     fig4 = pyplot.figure(figsize=(18,12), dpi=80)
     fig4.suptitle('Position and Standard Distribution', fontsize=14, fontweight='bold',
