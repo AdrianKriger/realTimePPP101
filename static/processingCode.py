@@ -17,7 +17,7 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
-from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_ply#, move_debug
 
 def read_target(cntr, crs):
     
@@ -107,7 +107,7 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     [rms_3d, std_3d] = d2(df.xyz, cn['Rxyz'])
     
     #rms2d = get_2drms(df['distx(m)'], df['disty(m)'])
-    rms2d = get_rms2d(std_x, std_y)
+    rms2d = get_rms2d(rms_x, rms_y)
     #mrse = get_mrse(df['distx(m)'], df['disty(m)'], df['distz(m)'])
     mrse = get_mrse(rms_x, rms_y, rms_z)
                 
@@ -180,6 +180,11 @@ def plot(df, jparams):
     # 1 plot - ground track 
     grnd_track_ply(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
     
+# def move_files(jparams):
+    
+#     move_debug(jparams)
+    
+
 
     
     
