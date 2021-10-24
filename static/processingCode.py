@@ -56,9 +56,9 @@ def buildDataFrame(posFile, cntr, crs, jparams):
 
     df['sd(m)'] = np.sqrt(df['sdn(m)']**2+df['sde(m)']**2+df['sdu(m)']**2+df['sdne(m)']**2+df['sdeu(m)']**2+df['sdun(m)']**2)
     df['dist(m)'] = 0.0
-    df['disty(m)'] = 0.0
-    df['distx(m)'] = 0.0
-    df['distz(m)'] = 0.0
+    df['deltay(m)'] = 0.0
+    df['deltax(m)'] = 0.0
+    df['deltaz(m)'] = 0.0
     
     myProj = Proj(crs)
     x, y = myProj(df['longitude(deg)'].values, df['latitude(deg)'].values)
@@ -161,18 +161,18 @@ def plot(df, jparams):
     xminlim = df.x.min() - xdif*0.1
     xmaxlim = df.x.max() + xdif*0.1
     
-    distnmin = df['disty(m)'].min()
-    distnmax = df['disty(m)'].max()
-    distemin = df['distx(m)'].min()
-    distemax = df['distx(m)'].max()
+    distnmin = df['deltay(m)'].min()
+    distnmax = df['deltay(m)'].max()
+    distemin = df['deltax(m)'].min()
+    distemax = df['deltax(m)'].max()
     
     distndif = distnmax - distnmin
     distedif = distemax - distemin
     
-    distnminlim = df['disty(m)'].min() - distndif*0.1
-    distnmaxlim = df['disty(m)'].max() + distndif*0.1
-    disteminlim = df['distx(m)'].min() - distedif*0.1
-    distemaxlim = df['distx(m)'].max() + distedif*0.1
+    distnminlim = df['deltay(m)'].min() - distndif*0.1
+    distnmaxlim = df['deltay(m)'].max() + distndif*0.1
+    disteminlim = df['deltax(m)'].min() - distedif*0.1
+    distemaxlim = df['deltax(m)'].max() + distedif*0.1
     
     distmax = df['dist(m)'].max()
     distmin = df['dist(m)'].min()
@@ -188,7 +188,7 @@ def plot(df, jparams):
     
     sd = ['sd_y','sd_x','sd_x'] #,'sdne','sdeu','sdun']
     dd = ['Y','X','Z'] #,'distne','disteu','distun']
-    dist = [df['disty(m)'], df['distx(m)'], df['distz(m)']] #,distne,disteu,distun]
+    dist = [df['deltay(m)'], df['deltax(m)'], df['deltaz(m)']] #,distne,disteu,distun]
 
     # 2 plots - i) distance vs Time ii) std dev vs Time
     distTime_std_plt(df, sd, dd, dist, time, jparams)
