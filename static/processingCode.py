@@ -120,6 +120,12 @@ def buildDataFrame(posFile, cntr, crs, jparams):
                                                                 rms_3d, std_3d,
                                                                 rms2d, mrse))
     file.close()
+    
+    columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
+           'sdn(m)', 'sde(m)', 'sdu(m)', 'sdne(m)', 'sdeu(m)', 'sdun(m)', 'age(s)', 'ratio', 
+           'sd(m)', 'dist(m)', 'deltay(m)', 'deltax(m)', 'deltaz(m)']
+    df1 = pd.DataFrame(df, columns=columns)
+    df1.to_csv(jparams['solution_df'])
             
     return df
 
