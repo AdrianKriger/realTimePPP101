@@ -86,21 +86,30 @@ def buildDataFrame(posFile, cntr, crs, jparams):
         j = Point(df['x'][i], df['y'][i])
         k = Point(cn['x'], df['y'][i])
         l = Point(df['x'][i], cn['y'])
-                
+        
+        #j = d(reference, j)#.meters
+        #k = d(reference, k)#.meters#*np.sign(east)
+        #l = d(reference, l)#.meters#*np.sign(north)
+        #m = (df['height(m)'][i] - cn['z'])
+        #q = np.core.sqrt(j**2+m**2)
+        
         j = reference.distance(j)#.meters
-        k = reference.distance(k)#.meters#*np.sign(east)
-        l = reference.distance(l)#.meters#*np.sign(north)
+        #k = reference.distance(k)#.meters#*np.sign(east)
+        #l = reference.distance(l)#.meters#*np.sign(north)
         m = (df['height(m)'][i] - cn['z'])
+        k = (df['y'][i] - cn['y'])
+        l = (df['x'][i] - cn['x'])
+        
         q = np.core.sqrt(j**2+m**2)
         
         df['dist(m)'][i] = q
-        df['disty(m)'][i] = k
-        df['distx(m)'][i] = l
-        df['distz(m)'][i] = m
+        df['deltay(m)'][i] = k
+        df['deltax(m)'][i] = l
+        df['deltaz(m)'][i] = m
     
     cn['Rxyz'] = cn['x'] + cn['y'] + cn['z']
     df['xyz'] = df['x'] + df['y'] + df['height(m)']
-            
+           
     [rms_x, std_x] = d2(df.x, cn.x)
     [rms_y, std_y] = d2(df.y, cn.y)
     [rms_z, std_z] = d2(df['height(m)'], cn.z)
