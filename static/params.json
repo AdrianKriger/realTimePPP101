@@ -8,6 +8,9 @@
     "statistic_txt": "rms_std_202110240757.txt",
     "solution_df": "./sol/cpt_202110240757.csv",
     
+    "cmd_cnvin_path": "C:{full path}/RTKLIB_2_4_3_b34/bin/convbin",
+    "cmd_cnvin_dir": "C:/{full path}/rtklib_realTime_PPP/log",
+    
     "distanceTime_std_fig": "./img/Fig01.png",
     "xyz_ground_track_fig": "./img/Fig02.png"
 }
