@@ -6,6 +6,10 @@
 # -- based on:
 #           - Ruffin: https://github.com/ruffsl/RTKLIB-Tools
 #           - Chen Chao: https://github.com/heiwa0519/PPPLib
+import os, sys
+import subprocess
+
+import json
 
 import math
 import time
@@ -120,23 +124,43 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     #mrse = get_mrse(df['distx(m)'], df['disty(m)'], df['distz(m)'])
     mrse = get_mrse(rms_x, rms_y, rms_z)
                 
-    with open(jparams['statistic_txt'], "w") as file:
-        #file.write(str(rms_x))
-        file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\
-        \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
-                                                                rms_y, std_y, 
-                                                                rms_z, std_z, 
-                                                                rms_3d, std_3d,
-                                                                rms2d, mrse))
-    file.close()
+    # with open(jparams['statistic_txt'], "w") as file:
+    #     #file.write(str(rms_x))
+    #     file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\
+    #     \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
+    #                                                             rms_y, std_y, 
+    #                                                             rms_z, std_z, 
+    #                                                             rms_3d, std_3d,
+    #                                                             rms2d, mrse))
+    # file.close()
     
-    columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
-           'sdn(m)', 'sde(m)', 'sdu(m)', 'sdne(m)', 'sdeu(m)', 'sdun(m)', 'age(s)', 'ratio', 
-           'sd(m)', 'dist(m)', 'deltay(m)', 'deltax(m)', 'deltaz(m)']
-    df1 = pd.DataFrame(df, columns=columns)
-    df1.to_csv(jparams['solution_df'])
+    # columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
+    #        'sdn(m)', 'sde(m)', 'sdu(m)', 'sdne(m)', 'sdeu(m)', 'sdun(m)', 'age(s)', 'ratio', 
+    #        'sd(m)', 'dist(m)', 'deltay(m)', 'deltax(m)', 'deltaz(m)']
+    # df1 = pd.DataFrame(df, columns=columns)
+    # df1.to_csv(jparams['solution_df'])
             
     return df
+
+def convin(jparams):
+
+    fname = jparams["input-rtkpos"]
+    start = './sol/cpt_'
+    end = '.pos'
+    file = fname[fname.find(start)+len(start):fname.rfind(end)]
+    #print(file)
+    
+    cnvbin = jparams["cmd_cnvin_path"]
+    
+    command = ([cnvbin, jparams["cmd_cnvin_dir"] + '/' + 'cpt_obs_log_' +  file + '.rtcm3', '-r', 'rtcm3',
+                '-d', jparams["cmd_cnvin_dir"],
+                '-o',  file + '.obs', 
+                '-n',  file + '.nav'])#, 
+                #'-od', '-os', '-oi', '-ot', '-ol'])
+        
+    #print('\nRunning ')
+    #print(' '.join(command))
+    subprocess.check_call(command)
 
 def plot(df, jparams):
     
