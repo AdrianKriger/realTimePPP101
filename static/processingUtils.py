@@ -123,8 +123,9 @@ def move_debug(jparams):
     end = '.pos'
     f = fname[fname.find(start)+len(start):fname.rfind(end)]
     
-    shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".stat", "./trace_stats/rtknavi_" + f + ".stat")
-    shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".trace", "./trace_stats/rtknavi_" + f + ".trace")
+    if os.path.exists("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".stat"):
+        shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".stat", "./trace_stats/rtknavi_" + f + ".stat")
+        shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".trace", "./trace_stats/rtknavi_" + f + ".trace")
  
 
 def distTime_std_plt(df, sd, dd, dist, time, jparams):
