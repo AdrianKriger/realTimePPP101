@@ -9,7 +9,7 @@ import os
 import shutil
 import json, sys
 
-from processingCode import buildDataFrame, plot, move_files
+from processingCode import buildDataFrame, plot, move_files, convin
 
 def main():
     try:
@@ -28,7 +28,10 @@ def main():
     # read the .pos to df
     df = buildDataFrame(posFile, cntr, crs, jparams)
     
-    plot(df, jparams)
+    convin(jparams)
+    
+    if jparams['plots'] == 'True':
+        plot(df, jparams)
 
 
 if __name__ == "__main__":
