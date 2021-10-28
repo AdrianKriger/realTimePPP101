@@ -21,7 +21,7 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
-from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist
 
 def read_target(cntr, crs):
     
@@ -134,16 +134,16 @@ def buildDataFrame(posFile, cntr, crs, jparams):
                                                                         rms_3d, std_3d,
                                                                         rms2d, mrse))
         file.close()
-        
+            
+    columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
+            'sdn(m)', 'sde(m)', 'sdu(m)', 'sdne(m)', 'sdeu(m)', 'sdun(m)', 'age(s)', 'ratio', 
+            'sd(m)', 'dist(m)', 'deltay(m)', 'deltax(m)', 'deltaz(m)']
+    df1 = pd.DataFrame(df, columns=columns)
+
     if jparams['write_DataFrame'] == "True":
-        
-        columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
-                'sdn(m)', 'sde(m)', 'sdu(m)', 'sdne(m)', 'sdeu(m)', 'sdun(m)', 'age(s)', 'ratio', 
-                'sd(m)', 'dist(m)', 'deltay(m)', 'deltax(m)', 'deltaz(m)']
-        df1 = pd.DataFrame(df, columns=columns)
         df1.to_csv(jparams['solution_df'])
             
-    return df
+    return df1
 
 def convin(jparams):
 
@@ -215,12 +215,16 @@ def plot(df, jparams):
     zero = md.date2num(zero)
     time = [t-zero for t in md.date2num(time)]
     
-    sd = ['sd_y','sd_x','sd_x'] #,'sdne','sdeu','sdun']
+    sd = ['sd_y','sd_x','sd_z'] #,'sdne','sdeu','sdun']
     dd = ['Y','X','Z'] #,'distne','disteu','distun']
     dist = [df['deltay(m)'], df['deltax(m)'], df['deltaz(m)']] #,distne,disteu,distun]
 
     # 2 plots - i) distance vs Time ii) std dev vs Time
     distTime_std_plt(df, sd, dd, dist, time, jparams)
+    # - standard error distribution
+    std_errorDist(df, sd, dist, jparams)
+    # - absolute / position error distribution
+    pos_errorDist(df, sd, dist, jparams)
     # 1 plot - ground track 
     grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
     

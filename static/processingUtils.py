@@ -15,12 +15,12 @@ import time
 from datetime import datetime
 
 import matplotlib as mpl
-from matplotlib import pyplot
+#from matplotlib import pyplot
+import matplotlib.pyplot as plt
 import matplotlib.pylab as pl
 import matplotlib.dates as md
-#from datetime import *
 
-import matplotlib as mpl
+import seaborn as sns
 
 def get_average(records):
     """
@@ -133,7 +133,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     colors = pl.cm.viridis(np.linspace(0,1,3))
     
     # Create a new figure of size 10x6 points, using 80 dots per inch
-    fig1 = pyplot.figure(figsize=(18,12), dpi=80)
+    fig1 = plt.figure(figsize=(18,12), dpi=80)
     fig1.suptitle('Position / Time', fontsize=14, fontweight='bold')
     ax = fig1.add_subplot(2,1,1)
       
@@ -149,7 +149,7 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_xlabel('Time (h:m)')
       
     # Make legend
-    pyplot.legend(loc='upper left')
+    plt.legend(loc='upper left')
     
     ax = fig1.add_subplot(2,1,2)
       
@@ -167,23 +167,65 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_xlabel('Time (h:m)')
       
     # Make legend
-    pyplot.legend(loc='upper left')
+    plt.legend(loc='upper left')
     
     # Save figure using 72 dots per inch
-    pyplot.savefig(jparams['distanceTime_std_fig'],dpi=72)
+    plt.savefig(jparams['distanceTime_std_fig'],dpi=72)
     
+def std_errorDist(df, sd, dist, jparams):
+    
+    fig5 = plt.figure(figsize=(12, 6), dpi=80)
+    fig5.suptitle('Standard Deviation Distribution', fontsize=14, fontweight='bold')
+    #formatter = FuncFormatter(to_percent)
+    for i in range(len(sd)):
+        #sdx = data[i+6]
+        sdx = df.iloc[:, 9+i]
+        ax = fig5.add_subplot(1, 3, i+1)
+        #weights = np.ones_like(abs(sdx))/len(sdx)
+        #p = ax.hist(abs(sdx), bins=50, weights=weights)
+        p = ax.hist(sdx, bins=50)#, weights=weights)
+        #ax.yaxis.set_major_formatter(formatter)
+        ax.set_title(sd[i]) 
+        ax.set_ylabel('')
+        ax.set_xlabel('Value')
+        ax.grid(True)
+    #pyplot.show()
+    # Save figure using 72 dots per inch
+    plt.savefig(jparams['std_dist_fig'], dpi=80)
+
+def pos_errorDist(df, sd, dist, jparams):
+     
+    fig6 = plt.figure(figsize=(12, 6), dpi=80)
+    fig6.suptitle('Position Error Distribution', fontsize=14, fontweight='bold')
+    #formatter = FuncFormatter(to_percent)
+    for i in range(len(sd)):
+        #sdx = data[i+6]
+        sdx = df.iloc[:, 19+i]
+        ax = fig6.add_subplot(1, 3, i+1)
+        #weights = np.ones_like(abs(sdx))/len(sdx)
+        #p = ax.hist(abs(sdx), bins=50, weights=weights)
+        p = ax.hist(dist[i], bins=50)#, weights=weights)
+        #ax.yaxis.set_major_formatter(formatter)
+        ax.set_title(sd[i]) 
+        ax.set_ylabel('')
+        ax.set_xlabel('Value')
+        ax.grid(True)
+    #pyplot.show()
+    # Save figure using 72 dots per inch
+    plt.savefig(jparams['err_dist_fig'], dpi=80)
+
 def grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams):
     
-    fig4 = pyplot.figure(figsize=(18,12), dpi=80)
+    fig4 = plt.figure(figsize=(18,12), dpi=80)
     fig4.suptitle('Position and Standard Distribution', fontsize=14, fontweight='bold',
                   horizontalalignment='right', x=0.71, y=0.93,
                   verticalalignment='top')
     #ax = fig4.add_subplot(111)
     ax = fig4.add_subplot(111,aspect='equal')
-    p = ax.scatter(df['disty(m)'], df['distx(m)'], c=-df['dist(m)'], alpha=.5, cmap='jet')
+    p = ax.scatter(df['deltay(m)'], df['deltax(m)'], c=-df['dist(m)'], alpha=.5, cmap='jet')
     fig4.colorbar(p)
-    pyplot.xlim(distnminlim, distnmaxlim)
-    pyplot.ylim(disteminlim, distemaxlim)
+    plt.xlim(distnminlim, distnmaxlim)
+    plt.ylim(disteminlim, distemaxlim)
     #ax.xaxis.set_major_locator(MultipleLocator(100))
     #ax.yaxis.set_major_locator(MultipleLocator(100))
     ax.set_xlabel('X (meters)')
@@ -191,4 +233,4 @@ def grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jpara
     ax.grid(True)
     
     # Save figure using 72 dots per inch
-    pyplot.savefig(jparams['xyz_ground_track_fig'], dpi=72)
+    plt.savefig(jparams['xyz_ground_track_fig'], dpi=72)

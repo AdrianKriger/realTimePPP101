@@ -28,11 +28,10 @@ def main():
     # read the .pos to df
     df = buildDataFrame(posFile, cntr, crs, jparams)
     
-    convin(jparams)
+    #convin(jparams)
     
     if jparams['plots'] == 'True':
         plot(df, jparams)
-
 
 if __name__ == "__main__":
     main()
