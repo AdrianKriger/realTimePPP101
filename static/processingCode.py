@@ -21,6 +21,9 @@ from pyproj import Proj
 from shapely.geometry import Point
 import shapely.geometry
 
+import matplotlib.dates as md
+
+
 from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist
 
 def read_target(cntr, crs):
@@ -169,64 +172,63 @@ def convin(jparams):
 
 def plot(df, jparams):
     
-    import matplotlib as mpl
+    #import matplotlib as mpl
     #from matplotlib import pyplot
     #import matplotlib.pylab as pl
-    import matplotlib.dates as md
     #from datetime import *
     
     #import matplotlib as mpl
 
-    ymin = df.y.min()
-    ymax = df.y.max()
-    xmin = df.x.min()
-    xmax = df.x.max()
+    # ymin = df.y.min()
+    # ymax = df.y.max()
+    # xmin = df.x.min()
+    # xmax = df.x.max()
     
-    ydif = ymax - ymin
-    xdif = xmax - xmin
+    # ydif = ymax - ymin
+    # xdif = xmax - xmin
     
-    yminlim = df.y.min() - ydif*0.1
-    ymaxlim = df.y.max() + ydif*0.1
-    xminlim = df.x.min() - xdif*0.1
-    xmaxlim = df.x.max() + xdif*0.1
+    # yminlim = df.y.min() - ydif*0.25
+    # ymaxlim = df.y.max() + ydif*0.25
+    # xminlim = df.x.min() - xdif*0.25
+    # xmaxlim = df.x.max() + xdif*0.25
     
-    distnmin = df['deltay(m)'].min()
-    distnmax = df['deltay(m)'].max()
-    distemin = df['deltax(m)'].min()
-    distemax = df['deltax(m)'].max()
+    # distnmin = df['deltay(m)'].min()
+    # distnmax = df['deltay(m)'].max()
+    # distemin = df['deltax(m)'].min()
+    # distemax = df['deltax(m)'].max()
     
-    distndif = distnmax - distnmin
-    distedif = distemax - distemin
+    # distndif = distnmax - distnmin
+    # distedif = distemax - distemin
     
-    distnminlim = df['deltay(m)'].min() - distndif*0.1
-    distnmaxlim = df['deltay(m)'].max() + distndif*0.1
-    disteminlim = df['deltax(m)'].min() - distedif*0.1
-    distemaxlim = df['deltax(m)'].max() + distedif*0.1
+    # distnminlim = df['deltay(m)'].min() - distndif*0.1
+    # distnmaxlim = df['deltay(m)'].max() + distndif*0.1
+    # disteminlim = df['deltax(m)'].min() - distedif*0.1
+    # distemaxlim = df['deltax(m)'].max() + distedif*0.1
     
-    distmax = df['dist(m)'].max()
-    distmin = df['dist(m)'].min()
-    distnorm = mpl.colors.Normalize(vmin=-distmax, vmax=0)
+    # distmax = df['dist(m)'].max()
+    # distmin = df['dist(m)'].min()
+    # distnorm = mpl.colors.Normalize(vmin=-distmax, vmax=0)
     
     tdate = df['UTC']-df['UTC'][0]
     # specify a date to use for the times
     zero = df['UTC'][0]
-    time = [zero + t for t in tdate]
+    dtime = [zero + t for t in tdate]
     # convert datetimes to numbers
     zero = md.date2num(zero)
-    time = [t-zero for t in md.date2num(time)]
+    dtime = [t-zero for t in md.date2num(dtime)]
     
-    sd = ['sd_y','sd_x','sd_z'] #,'sdne','sdeu','sdun']
-    dd = ['Y','X','Z'] #,'distne','disteu','distun']
-    dist = [df['deltay(m)'], df['deltax(m)'], df['deltaz(m)']] #,distne,disteu,distun]
+    #sd = ['sd_y','sd_x','sd_z'] #,'sdne','sdeu','sdun']
+    #dd = ['Y','X','Z'] #,'distne','disteu','distun']
+    #dist = [df['deltay(m)'], df['deltax(m)'], df['deltaz(m)']] #,distne,disteu,distun]
 
     # 2 plots - i) distance vs Time ii) std dev vs Time
-    distTime_std_plt(df, sd, dd, dist, time, jparams)
+    distTime_std_plt(df, dtime, jparams)
     # - standard error distribution
-    std_errorDist(df, sd, dist, jparams)
+    std_errorDist(df, jparams)
     # - absolute / position error distribution
-    pos_errorDist(df, sd, dist, jparams)
+    pos_errorDist(df, jparams)
     # 1 plot - ground track 
-    grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams)
+    grnd_track_plt(df, jparams)
     
 def move_files(jparams):
     

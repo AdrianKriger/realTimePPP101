@@ -19,6 +19,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pl
 import matplotlib.dates as md
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import seaborn as sns
 
@@ -128,7 +129,7 @@ def move_debug(jparams):
         shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".trace", "./trace_stats/rtknavi_" + f + ".trace")
  
 
-def distTime_std_plt(df, sd, dd, dist, time, jparams):
+def distTime_std_plt(df, time, jparams):
     
     colors = pl.cm.viridis(np.linspace(0,1,3))
     
@@ -136,10 +137,11 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     fig1 = plt.figure(figsize=(18,12), dpi=80)
     fig1.suptitle('Position / Time', fontsize=14, fontweight='bold')
     ax = fig1.add_subplot(2,1,1)
+    names = ['delta y','delta x','delta z']
       
     # Make plots
-    for i in range(len(sd)):
-        ax.plot(time, dist[i], label=dd[i], color=colors[i]) #tdate
+    for i in range(len(names)):
+        ax.plot(time, df.iloc[:, 19+i], label=names[i], color=colors[i]) #tdate
     
     # ax.plot(tdate,dist, label='dist')
     ax.grid(True)
@@ -149,15 +151,15 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_xlabel('Time (h:m)')
       
     # Make legend
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper right')
     
     ax = fig1.add_subplot(2,1,2)
-      
+    names = ['std y','std x','std z'] 
     # Make plots
-    for i in range(len(sd)):
+    for i in range(len(names)):
         #sdx = df[i+8]
-        sdx = df.iloc[:, 9+i]
-        ax.plot(time, sdx, label=sd[i], color=colors[i]) #tdate
+        #sdx = df.iloc[:, 9+i]
+        ax.plot(time, df.iloc[:, 9+i], label=names[i], color=colors[i]) #tdate
     
     # ax.plot(tdate,dist, label='dist')
     ax.grid(True)
@@ -167,65 +169,105 @@ def distTime_std_plt(df, sd, dd, dist, time, jparams):
     ax.set_xlabel('Time (h:m)')
       
     # Make legend
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper right')
     
     # Save figure using 72 dots per inch
     plt.savefig(jparams['distanceTime_std_fig'],dpi=72)
     
-def std_errorDist(df, sd, dist, jparams):
+# def std_errorDist(df, sd, dist, jparams):
     
-    fig5 = plt.figure(figsize=(12, 6), dpi=80)
-    fig5.suptitle('Standard Deviation Distribution', fontsize=14, fontweight='bold')
-    #formatter = FuncFormatter(to_percent)
-    for i in range(len(sd)):
-        #sdx = data[i+6]
-        sdx = df.iloc[:, 9+i]
-        ax = fig5.add_subplot(1, 3, i+1)
-        #weights = np.ones_like(abs(sdx))/len(sdx)
-        #p = ax.hist(abs(sdx), bins=50, weights=weights)
-        p = ax.hist(sdx, bins=50)#, weights=weights)
-        #ax.yaxis.set_major_formatter(formatter)
-        ax.set_title(sd[i]) 
-        ax.set_ylabel('')
-        ax.set_xlabel('Value')
-        ax.grid(True)
-    #pyplot.show()
-    # Save figure using 72 dots per inch
+#     fig5 = plt.figure(figsize=(12, 6), dpi=80)
+#     fig5.suptitle('Standard Deviation Distribution', fontsize=14, fontweight='bold')
+#     #formatter = FuncFormatter(to_percent)
+#     for i in range(len(sd)):
+#         #sdx = data[i+6]
+#         sdx = df.iloc[:, 9+i]
+#         ax = fig5.add_subplot(1, 3, i+1)
+#         #weights = np.ones_like(abs(sdx))/len(sdx)
+#         #p = ax.hist(abs(sdx), bins=50, weights=weights)
+#         p = ax.hist(sdx, bins=50)#, weights=weights)
+#         #ax.yaxis.set_major_formatter(formatter)
+#         ax.set_title(sd[i]) 
+#         ax.set_ylabel('')
+#         ax.set_xlabel('Value')
+#         ax.grid(True)
+#     #pyplot.show()
+#     # Save figure using 72 dots per inch
+#     plt.savefig(jparams['std_dist_fig'], dpi=80)
+ 
+def std_errorDist(df,  jparams):    
+    
+    names = ['std y', 'std x', 'std z']
+    
+    f, axs = plt.subplots(1, 3, figsize=(9, 6), sharey=True)
+    for i in range(len(names)):
+        #sdx = df.iloc[:, 9+i]
+        #plt.subplot(1, 3, i+1)
+        sns.histplot(df.iloc[:, 9+i], bins=50, ax=axs[i]) #kde=True,
+        axs[i].set_xlabel(names[i])
+    f.suptitle('Standard Deviation Distribution', fontsize=14, fontweight='bold')
+    #plt.show()
+    # save
     plt.savefig(jparams['std_dist_fig'], dpi=80)
-
-def pos_errorDist(df, sd, dist, jparams):
-     
-    fig6 = plt.figure(figsize=(12, 6), dpi=80)
-    fig6.suptitle('Position Error Distribution', fontsize=14, fontweight='bold')
-    #formatter = FuncFormatter(to_percent)
-    for i in range(len(sd)):
-        #sdx = data[i+6]
-        sdx = df.iloc[:, 19+i]
-        ax = fig6.add_subplot(1, 3, i+1)
-        #weights = np.ones_like(abs(sdx))/len(sdx)
-        #p = ax.hist(abs(sdx), bins=50, weights=weights)
-        p = ax.hist(dist[i], bins=50)#, weights=weights)
-        #ax.yaxis.set_major_formatter(formatter)
-        ax.set_title(sd[i]) 
-        ax.set_ylabel('')
-        ax.set_xlabel('Value')
-        ax.grid(True)
-    #pyplot.show()
-    # Save figure using 72 dots per inch
+    
+def pos_errorDist(df, jparams):
+    
+    names = ['delta y', 'delta x', 'delta z']
+    
+    f, axs = plt.subplots(1, 3, figsize=(9, 6), sharey=True)
+    for i in range(len(names)):
+        #sdx = df.iloc[:, 9+i]
+        #plt.subplot(1, 3, i+1)
+        sns.histplot(df.iloc[:, 9+i], bins=50, ax=axs[i])#, kde=kde)
+        axs[i].set_xlabel(names[i])
+    f.suptitle('Absolute Error', fontsize=14, fontweight='bold')
+    #plt.show()
+    # save
     plt.savefig(jparams['err_dist_fig'], dpi=80)
 
-def grnd_track_plt(df, distnminlim, distnmaxlim, disteminlim, distemaxlim, jparams):
+# def pos_errorDist(df, sd, dist, jparams):
+     
+#     fig6 = plt.figure(figsize=(12, 6), dpi=80)
+#     fig6.suptitle('Position Error Distribution', fontsize=14, fontweight='bold')
+#     #formatter = FuncFormatter(to_percent)
+#     for i in range(len(sd)):
+#         #sdx = data[i+6]
+#         sdx = df.iloc[:, 19+i]
+#         ax = fig6.add_subplot(1, 3, i+1)
+#         #weights = np.ones_like(abs(sdx))/len(sdx)
+#         #p = ax.hist(abs(sdx), bins=50, weights=weights)
+#         p = ax.hist(dist[i], bins=50)#, weights=weights)
+#         #ax.yaxis.set_major_formatter(formatter)
+#         ax.set_title(sd[i]) 
+#         ax.set_ylabel('')
+#         ax.set_xlabel('Value')
+#         ax.grid(True)
+#     #pyplot.show()
+#     # Save figure using 72 dots per inch
+#     plt.savefig(jparams['err_dist_fig'], dpi=80)
+
+def grnd_track_plt(df, jparams):
     
-    fig4 = plt.figure(figsize=(18,12), dpi=80)
-    fig4.suptitle('Position and Standard Distribution', fontsize=14, fontweight='bold',
-                  horizontalalignment='right', x=0.71, y=0.93,
+    fig4 = plt.figure(figsize=(12,12), dpi=80)
+    #plt.title('Center Title')
+    fig4.suptitle('Location and Standard Distribution', fontsize=14, fontweight='bold', 
+                  horizontalalignment='right', x=0.67, y=0.91,
                   verticalalignment='top')
     #ax = fig4.add_subplot(111)
     ax = fig4.add_subplot(111,aspect='equal')
     p = ax.scatter(df['deltay(m)'], df['deltax(m)'], c=-df['dist(m)'], alpha=.5, cmap='jet')
-    fig4.colorbar(p)
-    plt.xlim(distnminlim, distnmaxlim)
-    plt.ylim(disteminlim, distemaxlim)
+    #p = ax.scatter(df['y'], df['x'], c=-df['dist(m)'], alpha=.5, cmap='jet')
+    
+    
+    plt.xlim(df['deltay(m)'].min() - 0.3, df['deltay(m)'].max() + 0.3)
+    plt.ylim(df['deltax(m)'].min() - 0.3, df['deltax(m)'].max() + 0.3)
+    
+    # create an axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.09)
+    #fig4.colorbar(p)
+    fig4.colorbar(p, cax=cax)
     #ax.xaxis.set_major_locator(MultipleLocator(100))
     #ax.yaxis.set_major_locator(MultipleLocator(100))
     ax.set_xlabel('X (meters)')
