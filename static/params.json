@@ -12,13 +12,14 @@
     "write_DataFrame": "False",
     "solution_df": "./sol/cpt_202110240757.csv",
     
-    "convbin_path": "C:/rtklib_realTime_PPP/RTKLIB_2_4_3_b34/bin/convbin.exe",
-    "convbin_dir": "C:/rtklib_realTime_PPP/log",
+    "convbin_path": "C:/Adrian/rtklib_realTime_PPP/RTKLIB_2_4_3_b34/bin/convbin.exe",
+    "convbin_dir": "C:/Adrian/rtklib_realTime_PPP/log",
     
     "plots": "True",    
     "distanceTime_std_fig": "./img/Fig01_distStdTime.png",
     "xyz_ground_track_fig": "./img/Fig02_grnd.png",
     "std_dist_fig": "./img/Fig03_stdxyzDist.png",
-    "err_dist_fig": "./img/Fig04_absxyzError.png"
+    "err_dist_fig": "./img/Fig04_absxyzError.png",
+    "distanceTime_conv": "./img/Fig05_convergence.png"
 }
 

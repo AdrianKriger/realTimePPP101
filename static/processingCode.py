@@ -24,7 +24,7 @@ import shapely.geometry
 import matplotlib.dates as md
 
 
-from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist, pos_Convg
 
 def read_target(cntr, crs):
     
@@ -227,6 +227,8 @@ def plot(df, jparams):
     std_errorDist(df, jparams)
     # - absolute / position error distribution
     pos_errorDist(df, jparams)
+    # - absolute / position error distribution
+    pos_Convg(df, dtime, jparams)
     # 1 plot - ground track 
     grnd_track_plt(df, jparams)
     

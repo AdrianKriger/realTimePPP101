@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 import matplotlib.pylab as pl
 import matplotlib.dates as md
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1.inset_locator import (inset_axes, InsetPosition, mark_inset)
+
 
 import seaborn as sns
 
@@ -174,6 +176,62 @@ def distTime_std_plt(df, time, jparams):
     # Save figure using 72 dots per inch
     plt.savefig(jparams['distanceTime_std_fig'],dpi=72)
     
+def pos_Convg(df, time, jparams):
+    
+    colors = pl.cm.viridis(np.linspace(0,1,3))
+    
+    # Create a new figure of size 10x6 points, using 80 dots per inch
+    fig1 = plt.figure(figsize=(18, 12), dpi=80)
+    fig1.suptitle('Position / Time', fontsize=14, fontweight='bold')
+    ax = fig1.add_subplot(2,1,1)
+    names = ['delta y','delta x','delta z']
+      
+    # Make plots
+    for i in range(len(names)):
+        ax.plot(time, df.iloc[:, 19+i], label=names[i], color=colors[i]) #tdate
+      
+    # Make legend
+    plt.legend(loc='upper right')
+    
+    ax.grid(axis='y', linestyle='-', linewidth=0.3)
+    ax.set_ylabel('Absolute Error (m)')
+    ax.xaxis_date()
+    ax.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
+    ax.set_xlabel('Time (h:m)')
+          
+    # Make legend
+    plt.legend(loc='upper right')
+    
+    # Create a set of inset Axes
+    ax2 = plt.axes([0, 0, 1, 1])
+    # Manually set the position and relative size of the inset axes within ax1
+    ip = InsetPosition(ax, [0.4,0.4,0.5,0.5])
+    ax2.set_axes_locator(ip)
+    
+    # do the time for the inset
+    t1 = time[1799:3000]
+    indate = df[(df.index >= 1800) & (df.index <= 3000)]
+    
+    # plot the inset
+    for i in range(len(names)):
+        ax2.plot(t1, indate.iloc[:, 19+i], color=colors[i])#label=names[i]) #tdate
+
+    # -- https://stackoverflow.com/questions/44715968/matplotlib-change-style-of-inset-elements-singularly
+    plt.setp(list(ax2.spines.values()), linewidth=0.5, linestyle="--")
+    box, c1, c2 = mark_inset(ax, ax2, loc1=2, loc2=3, fc="none",  lw=0.3, ec='0.5')#,
+                             #ec=color[0], 
+                             #zorder=200)
+    #plt.setp(box, linewidth=3, color="grey")
+    plt.setp([c1,c2], linestyle=":")
+    
+    ax2.grid(axis='y', linestyle='-') #True
+    ax2.xaxis_date()
+    ax2.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
+    
+    #plt.show()
+    # Save figure
+    plt.savefig(jparams['distanceTime_conv'], dpi=72)
+    
 # def std_errorDist(df, sd, dist, jparams):
     
 #     fig5 = plt.figure(figsize=(12, 6), dpi=80)
@@ -218,7 +276,7 @@ def pos_errorDist(df, jparams):
     for i in range(len(names)):
         #sdx = df.iloc[:, 9+i]
         #plt.subplot(1, 3, i+1)
-        sns.histplot(df.iloc[:, 9+i], bins=50, ax=axs[i])#, kde=kde)
+        sns.histplot(df.iloc[:, 19+i], bins=50, ax=axs[i])#, kde=kde)
         axs[i].set_xlabel(names[i])
     f.suptitle('Absolute Error', fontsize=14, fontweight='bold')
     #plt.show()
