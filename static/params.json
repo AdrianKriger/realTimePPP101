@@ -1,25 +1,27 @@
 {
-    "input-rtkpos": "./sol/cpt_202110241204.pos",
+    "input-rtkpos": "./sol/cpt_202111041511.pos",
     
     "crs": "proj=utm +zone=34 +south +datum=WGS84 +units=m +no_defs",
-    "reference-point": "./configs_settings/apriori_za_coords.pos",
+    "reference-point": "./configs_settings/apriori_za_coords.csv",
+    "target_row": 5,
     
     "gps-leapSec": 14,
     
-    "write_rms": "False",
-    "statistic_txt": "rms_std_202110240757.txt",
+    "write_rms": "True",
+    "statistic_txt": "rms_std_202111041511.txt",
     
-    "write_DataFrame": "False",
-    "solution_df": "./sol/cpt_202110240757.csv",
+    "write_DataFrame": "True",
+    "solution_df": "./sol/cpt_202111041511.csv",
     
-    "convbin_path": "C:/Adrian/rtklib_realTime_PPP/RTKLIB_2_4_3_b34/bin/convbin.exe",
-    "convbin_dir": "C:/Adrian/rtklib_realTime_PPP/log",
+    "convbin_path": "C:/rtklib_realTime_PPP/RTKLIB_2_4_3_b34/bin/convbin.exe",
+    "convbin_d5_path": "C:/rtklib_realTime_PPP/RTKLIB_demo5_b34b/bin/convbin.exe",
+    "convbin_dir": "C:/rtklib_realTime_PPP/log",
     
     "plots": "True",    
-    "distanceTime_std_fig": "./img/Fig01_distStdTime.png",
-    "xyz_ground_track_fig": "./img/Fig02_grnd.png",
-    "std_dist_fig": "./img/Fig03_stdxyzDist.png",
-    "err_dist_fig": "./img/Fig04_absxyzError.png",
-    "distanceTime_conv": "./img/Fig05_convergence.png"
+    "distanceTime_std_fig": "./img/cptFig01_distStdTime.png",
+    "xyz_ground_track_fig": "./img/cptFig02_grnd.png",
+    "std_dist_fig": "./img/cptFig03_stdxyzDist.png",
+    "err_dist_fig": "./img/cptFig04_absxyzError.png",
+    "distanceTime_conv": "./img/cptFig05_convergence.png"
 }
 
