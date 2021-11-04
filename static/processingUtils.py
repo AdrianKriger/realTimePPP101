@@ -122,7 +122,7 @@ def UTCFromGps(gpsWeek, SOW, leapSecs):
 def move_debug(jparams):
     fname = jparams['input-rtkpos']
 
-    start = './sol/cpt_'
+    start = './sol/*_'
     end = '.pos'
     f = fname[fname.find(start)+len(start):fname.rfind(end)]
     
@@ -181,8 +181,9 @@ def pos_Convg(df, time, jparams):
     colors = pl.cm.viridis(np.linspace(0,1,3))
     
     # Create a new figure of size 10x6 points, using 80 dots per inch
-    fig1 = plt.figure(figsize=(18, 12), dpi=80)
-    fig1.suptitle('Position / Time', fontsize=14, fontweight='bold')
+    fig1 = plt.figure(figsize=(18, 12))#, dpi=80)
+    fig1.suptitle('Position / Time', fontsize=14, fontweight='bold',
+                  horizontalalignment='center', x=0.5, y=0.92, verticalalignment='top')
     ax = fig1.add_subplot(2,1,1)
     names = ['delta y','delta x','delta z']
       
@@ -193,24 +194,24 @@ def pos_Convg(df, time, jparams):
     # Make legend
     plt.legend(loc='upper right')
     
-    ax.grid(axis='y', linestyle='-', linewidth=0.3)
-    ax.set_ylabel('Absolute Error (m)')
+    ax.grid(False)#axis='y', linestyle='-', linewidth=0.3)
+    ax.set_ylabel('Absolute Error (m)', fontweight='bold')
     ax.xaxis_date()
     ax.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
-    ax.set_xlabel('Time (h:m)')
+    ax.set_xlabel('Time (h:m)', fontweight='bold')
           
     # Make legend
     plt.legend(loc='upper right')
     
     # Create a set of inset Axes
-    ax2 = plt.axes([0, 0, 1, 1])
+    ax2 = plt.axes([0.1, 0.1, 1.1, 1.1])
     # Manually set the position and relative size of the inset axes within ax1
-    ip = InsetPosition(ax, [0.4,0.4,0.5,0.5])
+    ip = InsetPosition(ax, [0.35, 0.35, 0.45, 0.45])
     ax2.set_axes_locator(ip)
     
     # do the time for the inset
-    t1 = time[1799:3000]
-    indate = df[(df.index >= 1800) & (df.index <= 3000)]
+    t1 = time[1799:3600]
+    indate = df[(df.index >= 1800) & (df.index <= 3600)]
     
     # plot the inset
     for i in range(len(names)):
@@ -218,19 +219,19 @@ def pos_Convg(df, time, jparams):
 
     # -- https://stackoverflow.com/questions/44715968/matplotlib-change-style-of-inset-elements-singularly
     plt.setp(list(ax2.spines.values()), linewidth=0.5, linestyle="--")
-    box, c1, c2 = mark_inset(ax, ax2, loc1=2, loc2=3, fc="none",  lw=0.3, ec='0.5')#,
+    box, c1, c2 = mark_inset(ax, ax2, loc1=3, loc2=4, fc="none",  lw=0.3, ec='0.5')#,
                              #ec=color[0], 
                              #zorder=200)
     #plt.setp(box, linewidth=3, color="grey")
     plt.setp([c1,c2], linestyle=":")
     
-    ax2.grid(axis='y', linestyle='-') #True
+    ax2.grid(axis='y', linestyle='-', linewidth=0.3) #True
     ax2.xaxis_date()
     ax2.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
     
     #plt.show()
     # Save figure
-    plt.savefig(jparams['distanceTime_conv'], dpi=72)
+    plt.savefig(jparams['distanceTime_conv'])#, dpi=72)
     
 # def std_errorDist(df, sd, dist, jparams):
     
@@ -276,7 +277,9 @@ def pos_errorDist(df, jparams):
     for i in range(len(names)):
         #sdx = df.iloc[:, 9+i]
         #plt.subplot(1, 3, i+1)
-        sns.histplot(df.iloc[:, 19+i], bins=50, ax=axs[i])#, kde=kde)
+        sns.histplot(df.iloc[:, 19+i], bins=50, ax=axs[i]) 
+                     #kde=True, #stat="probalility", line_kws={'color':'r'})
+        #sns.kdeplot(df.iloc[:, 19+i], color="r", stat="probability")
         axs[i].set_xlabel(names[i])
     f.suptitle('Absolute Error', fontsize=14, fontweight='bold')
     #plt.show()
@@ -308,28 +311,22 @@ def grnd_track_plt(df, jparams):
     
     fig4 = plt.figure(figsize=(12,12), dpi=80)
     #plt.title('Center Title')
-    fig4.suptitle('Location and Standard Distribution', fontsize=14, fontweight='bold', 
-                  horizontalalignment='right', x=0.67, y=0.91,
+    fig4.suptitle('Position and Standard Distribution', fontsize=16, fontweight='bold', 
+                  horizontalalignment='center', x=0.46, y=0.90,
                   verticalalignment='top')
     #ax = fig4.add_subplot(111)
     ax = fig4.add_subplot(111,aspect='equal')
-    p = ax.scatter(df['deltay(m)'], df['deltax(m)'], c=-df['dist(m)'], alpha=.5, cmap='jet')
-    #p = ax.scatter(df['y'], df['x'], c=-df['dist(m)'], alpha=.5, cmap='jet')
+    p = ax.scatter(df['x'], df['y'], c=-df['dist(m)'], alpha=.5, cmap='jet')
     
-    
-    plt.xlim(df['deltay(m)'].min() - 0.3, df['deltay(m)'].max() + 0.3)
-    plt.ylim(df['deltax(m)'].min() - 0.3, df['deltax(m)'].max() + 0.3)
-    
-    # create an axes on the right side of ax. The width of cax will be 5%
-    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.09)
-    #fig4.colorbar(p)
     fig4.colorbar(p, cax=cax)
+    plt.xlim(df['x'].min() - 0.25, df['x'].max() + 0.25)
+    plt.ylim(df['y'].min() - 0.25, df['y'].max() + 0.25)
     #ax.xaxis.set_major_locator(MultipleLocator(100))
     #ax.yaxis.set_major_locator(MultipleLocator(100))
-    ax.set_xlabel('X (meters)')
-    ax.set_ylabel('Y (meters)')
+    ax.set_xlabel('x (meters)')
+    ax.set_ylabel('y (meters)')
     ax.grid(True)
     
     # Save figure using 72 dots per inch
