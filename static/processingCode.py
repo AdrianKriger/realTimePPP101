@@ -26,13 +26,13 @@ import matplotlib.dates as md
 
 from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist, pos_Convg
 
-def read_target(cntr, crs):
+def read_target(cntr, crs, jparams):
     
     # the reference point
     
-    c = pd.read_csv(cntr, sep='\t+', skiprows=4,  usecols=[1, 2, 3], engine='python',
+    c = pd.read_csv(cntr, sep='\t+', skiprows=jparams['target_row'],  usecols=[1, 2, 3], engine='python',
                     names=['lat', 'long', 'z'])
-    c = c.iloc[1]
+    c = c.iloc[0]
     c = pd.to_numeric(c)#, downcast="float")
     
     myProj = Proj(crs)
@@ -86,7 +86,7 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     # datetime
     df['UTC'] = pd.to_datetime(df['UTC'])
     
-    cn = read_target(cntr, crs)
+    cn = read_target(cntr, crs, jparams)
     reference = Point(cn['x'], cn['y'])
     
     for i in df.index :
@@ -157,14 +157,14 @@ def convin(jparams):
     #print(file)
     
     cnvbin = jparams["convbin_path"]
-    file_dir = jparams["convbin_dir"]
+    #file_dir = jparams["convbin_dir"]
     
     command = ([cnvbin, '-r', 'rtcm3', #'-v', '3.1',
-                '-d', file_dir,
+                #'-d', file_dir,
                 #'-ts', 'all', 
-                '-o', file + '.obs', #'-n',  file + '.nav',#, 
+                '-o', "C:/Adrian/rtklib_realTime_PPP/log/" + file + '.obs', #'-n',  file + '.nav',#, 
                 '-od', '-os',
-                file_dir + '/' + 'cpt_obs_log_' +  file + '.rtcm3'])#, '-oi', '-ot', '-ol'])
+                "C:/Adrian/rtklib_realTime_PPP/log" + '/' + 'cpt_obs_log_' +  file + '.rtcm3'])#, '-oi', '-ot', '-ol'])
         
     #print('\nRunning ')
     #print(' '.join(command))
