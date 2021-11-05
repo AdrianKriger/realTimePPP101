@@ -130,6 +130,17 @@ def move_debug(jparams):
         shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".stat", "./trace_stats/rtknavi_" + f + ".stat")
         shutil.move("./RTKLIB_2.4.3_b34/bin/rtknavi_" + f + ".trace", "./trace_stats/rtknavi_" + f + ".trace")
  
+def decimalDegree(degree, minute, second, hemisphere):
+    #https://stackoverflow.com/questions/27415327/using-pandas-convert-deg-min-sec-to-decimal-degrees-without-explicitly-iterating
+    if hemisphere.lower() in ["w", "s", "west", "south"]:
+        factor = -1.0
+    elif hemisphere.lower() in ["n", "e", "north", "east"]:
+        factor = 1.0
+    else:
+        raise ValueError("invalid hemisphere")
+
+    # check the order of operations in your code
+    return factor * (degree + (minute + second/60.)/60.)
 
 def distTime_std_plt(df, time, jparams):
     
@@ -309,18 +320,18 @@ def pos_errorDist(df, jparams):
 
 def grnd_track_plt(df, jparams):
     
-    fig4 = plt.figure(figsize=(12,12), dpi=80)
+    fig4 = plt.figure(figsize=(12,12))#, dpi=80)
     #plt.title('Center Title')
     fig4.suptitle('Position and Standard Distribution', fontsize=16, fontweight='bold', 
                   horizontalalignment='center', x=0.46, y=0.90,
                   verticalalignment='top')
     #ax = fig4.add_subplot(111)
-    ax = fig4.add_subplot(111,aspect='equal')
-    p = ax.scatter(df['x'], df['y'], c=-df['dist(m)'], alpha=.5, cmap='jet')
+    ax = fig4.add_subplot(111, aspect='equal')
+    p = ax.scatter(df['x'], df['y'], c=-df['dist(m)'], alpha=0.5, cmap='jet')
     
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.09)
-    fig4.colorbar(p, cax=cax)
+    #divider = make_axes_locatable(ax)
+    #cax = divider.append_axes("right")#, size="5%", pad=0.09)
+    fig4.colorbar(p, shrink=0.9)# cax=cax)
     plt.xlim(df['x'].min() - 0.25, df['x'].max() + 0.25)
     plt.ylim(df['y'].min() - 0.25, df['y'].max() + 0.25)
     #ax.xaxis.set_major_locator(MultipleLocator(100))
