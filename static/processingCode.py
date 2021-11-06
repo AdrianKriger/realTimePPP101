@@ -32,19 +32,19 @@ def read_target(cntr, crs, jparams):
     # the reference point
     
     c = pd.read_csv(cntr, sep='\t+', #skiprows=5, 
-                    comment ='#', usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9], engine='python',
-                    names=['latD', 'latM',  'latS', 'latH', 
+                    comment ='#', usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], engine='python',
+                    names=['Name', 'latD', 'latM',  'latS', 'latH', 
                            'lonD', 'lonM', 'lonS', 'lonH', 'z'])
     
     #- pd.to_numeric()
-    c[['latD', 'latM',  'latS','lonD', 'lonM', 'lonS','z']] = c[['latD', 'latM',  'latS','lonD', 'lonM', 'lonS','z']].apply(pd.to_numeric)
+    c[['latD', 'latM',  'latS','lonD', 'lonM', 'lonS','z']] = c[['latD', 'latM', 'latS','lonD', 'lonM', 'lonS','z']].apply(pd.to_numeric)
     #convert to decimal degrees
     c['lat'] = c.apply(lambda row: decimalDegree(row['latD'], row['latM'], row['latS'], 
                                       row['latH']), axis=1)
     c['long'] = c.apply(lambda row: decimalDegree(row['lonD'], row['lonM'], row['lonS'], 
                                        row['lonH']), axis=1)
     #- harvest only the necessary
-    c = c.iloc[jparams['target_row']]
+    c = c[c['Name'] == jparams['stn_name']]
     #- project
     myProj = Proj(crs)
     x, y = myProj(c['long'], c['lat'])
