@@ -148,7 +148,7 @@ def distTime_std_plt(df, time, jparams):
     
     # Create a new figure of size 10x6 points, using 80 dots per inch
     fig1 = plt.figure(figsize=(18,12), dpi=80)
-    fig1.suptitle('Position / Time', fontsize=14, fontweight='bold')
+    fig1.suptitle(jparams['stn_name'] + ' location error / Time', fontsize=14, fontweight='bold')
     ax = fig1.add_subplot(2,1,1)
     names = ['delta y','delta x','delta z']
       
@@ -193,7 +193,7 @@ def pos_Convg(df, time, jparams):
     
     # Create a new figure of size 10x6 points, using 80 dots per inch
     fig1 = plt.figure(figsize=(18, 12))#, dpi=80)
-    fig1.suptitle('Position / Time', fontsize=14, fontweight='bold',
+    fig1.suptitle(jparams['stn_name'] + ' location error / Time', fontsize=14, fontweight='bold',
                   horizontalalignment='center', x=0.5, y=0.92, verticalalignment='top')
     ax = fig1.add_subplot(2,1,1)
     names = ['delta y','delta x','delta z']
@@ -322,7 +322,7 @@ def grnd_track_plt(df, jparams):
     
     fig4 = plt.figure(figsize=(12,12))#, dpi=80)
     #plt.title('Center Title')
-    fig4.suptitle('Position and Standard Distribution', fontsize=16, fontweight='bold', 
+    fig4.suptitle(jparams['stn_name'] + ' Ground Track and Standard Distribution', fontsize=16, fontweight='bold', 
                   horizontalalignment='center', x=0.46, y=0.90,
                   verticalalignment='top')
     #ax = fig4.add_subplot(111)
