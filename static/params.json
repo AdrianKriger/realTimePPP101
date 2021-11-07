@@ -17,7 +17,7 @@
     "convbin_d5_path": "C:/rtklib_realTime_PPP/RTKLIB_demo5_b34b/bin/convbin.exe",
     "convbin_dir": "C:/rtklib_realTime_PPP/log",
     
-    "plots": "True",    
+    "plots": "False",    
     "distanceTime_std_fig": "./img/cptFig01_distStdTime.png",
     "xyz_ground_track_fig": "./img/cptFig02_grnd.png",
     "std_dist_fig": "./img/cptFig03_stdxyzDist.png",
