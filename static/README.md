@@ -1,1 +1,1 @@
-# Static tests
+**Static tests**
