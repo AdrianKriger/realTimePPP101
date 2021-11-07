@@ -1,3 +1,3 @@
 **Static tests**
 
-with [TrigNet Continuously Operating Reference Stations (CORS)](http://trignet.co.za/)
+with [TrigNet](http://trignet.co.za/) Continuously Operating Reference Stations (CORS)
