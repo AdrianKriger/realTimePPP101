@@ -1,7 +1,7 @@
 {
     "input-rtkpos": "./sol/cpt_202111041511.pos",
     
-    "crs": "proj=utm +zone=35 +south +datum=WGS84 +units=m +no_defs",
+    "crs": "proj=utm +zone=34 +south +datum=WGS84 +units=m +no_defs",
     "reference-point": "./configs_settings/apriori_za_coords.csv",
     "stn_name": "Ctwn-SB",
     
