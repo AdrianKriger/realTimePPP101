@@ -24,7 +24,6 @@ import shapely.geometry
 
 import matplotlib.dates as md
 
-
 from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
 
 def read_target(cntr, crs, jparams):
@@ -142,11 +141,15 @@ def buildDataFrame(posFile, cntr, crs, jparams):
         with open(jparams['statistic_txt'], "w") as file:
                 #file.write(str(rms_x))
                 file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\
-                \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}'.format(rms_x, std_x, 
+                \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}\n\nconvergence: deltay deltax deltaz\
+                    \n30 min (1800): {} {} {}\n45 min (2700): {} {} {}\n60 min (3600): {} {} {}'.format(rms_x, std_x, 
                                                                         rms_y, std_y, 
                                                                         rms_z, std_z, 
                                                                         rms_3d, std_3d,
-                                                                        rms2d, mrse))
+                                                                        rms2d, mrse,
+                                                                        round(df.at[1800,'deltay(m)'], 4), round(df.at[1800,'deltax(m)'], 4), round(df.at[1800,'deltaz(m)'], 4),
+                                                                        round(df.at[2700,'deltay(m)'], 4), round(df.at[2700,'deltax(m)'], 4), round(df.at[2700,'deltaz(m)'], 4),
+                                                                        round(df.at[3600,'deltay(m)'], 4), round(df.at[3600,'deltax(m)'], 4), round(df.at[3600,'deltaz(m)'], 4)))
         file.close()
             
     columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
@@ -155,7 +158,7 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     df1 = pd.DataFrame(df, columns=columns)
 
     if jparams['write_DataFrame'] == "True":
-        df1.to_csv(jparams['solution_df'])
+        df1.to_csv(jparams['solution_df'], index=False)
             
     return df1
 
