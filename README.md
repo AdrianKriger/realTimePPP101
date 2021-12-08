@@ -5,4 +5,4 @@ Experiments in Real-Time Precise Point Positioning (PPP) with [rtklib](http://ww
 *For now (2021) [navigation messages and correction streams](http://products.igs-ip.net/) are focused on BKG, DLR and GMV. That is:
 - BCEP00BKG0 and SSRA00BKG0 -> BKG
 - BCEP00DLR0 and SSRA00DLR0 -> DLR
-- BCEP00GMV0 and SSRA00GMV0 -> GMV**
+- BCEP00GMV0 and SSRA00GMV0 -> GMV*
