@@ -6,4 +6,4 @@ with [TrigNet](http://trignet.co.za/) Continuously Operating Reference Stations 
 
 &nbsp;
 
-* *these solutions need to be updated. [RTS corrections are in ITRF2014](https://igs.org/rts/products/) while the TrigNet stations are ITRF2008*. 
+*these solutions need to be updated. [RTS corrections are in ITRF2014](https://igs.org/rts/products/) while the TrigNet stations are ITRF2008*. 
