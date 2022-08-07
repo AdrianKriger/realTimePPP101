@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# env/geomatics01
+# - env/rt_ppp_env
 
 # author: arkriger - https://github.com/AdrianKriger/realTimePPP101
 
@@ -24,36 +24,41 @@ import shapely.geometry
 
 import matplotlib.dates as md
 
-from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
+#from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, distTime_std_plt, grnd_track_plt, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
+from processingUtils import UTCFromGps, d2, get_rms2d, get_mrse, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
+
 
 def read_target(cntr, crs, jparams):
     
     # the reference point
     
     c = pd.read_csv(cntr, sep='\t+', #skiprows=5, 
-                    comment ='#', usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], engine='python',
-                    names=['Name', 'latD', 'latM',  'latS', 'latH', 
-                           'lonD', 'lonM', 'lonS', 'lonH', 'z'])
+                    #comment ='#', usecols=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], engine='python',
+                    comment ='#', usecols=[0, 1, 2, 3], engine='python',
+                    #names=['Name', 'latD', 'latM',  'latS', 'latH', 'lonD', 'lonM', 'lonS', 'lonH', 'z'])
+                    names=['Name', 'lat', 'long', 'z'])
+
     
     #- pd.to_numeric()
-    c[['latD', 'latM',  'latS','lonD', 'lonM', 'lonS','z']] = c[['latD', 'latM', 'latS','lonD', 'lonM', 'lonS','z']].apply(pd.to_numeric)
+    #c[['latD', 'latM',  'latS','lonD', 'lonM', 'lonS','z']] = c[['latD', 'latM', 'latS','lonD', 'lonM', 'lonS','z']].apply(pd.to_numeric)
+    c[['lat', 'long', 'z']] = c[['lat', 'long', 'z']].apply(pd.to_numeric)
     #convert to decimal degrees
-    c['lat'] = c.apply(lambda row: decimalDegree(row['latD'], row['latM'], row['latS'], 
-                                      row['latH']), axis=1)
-    c['long'] = c.apply(lambda row: decimalDegree(row['lonD'], row['lonM'], row['lonS'], 
-                                       row['lonH']), axis=1)
+    #c['lat'] = c.apply(lambda row: decimalDegree(row['latD'], row['latM'], row['latS'], row['latH']), axis=1)
+    #c['long'] = c.apply(lambda row: decimalDegree(row['lonD'], row['lonM'], row['lonS'], row['lonH']), axis=1)
     #- harvest only the necessary
     c = c[c['Name'] == jparams['stn_name']]
+    #print(c)
     #- project
     myProj = Proj(crs)
     x, y = myProj(c['long'], c['lat'])
     # adding lists as new column to dataframe df
     c['y'] = y
     c['x'] = x
+    #print(y, x)
     
     return c    
     
-def buildDataFrame(posFile, cntr, crs, jparams):
+def prepareSolDF(posFile, cntr, crs, jparams):
     pd.options.mode.chained_assignment = None
     
     # build a df with the available data:
@@ -69,6 +74,7 @@ def buildDataFrame(posFile, cntr, crs, jparams):
                 skiprow = i
                 break
     df = pd.read_csv(posFile, skiprows=skiprow, delim_whitespace=True, parse_dates=[[0, 1]])
+    pd.options.display.float_format = "{:,.8f}".format
     #reference = gp.point.Point(df['latitude(deg)'][0], df['longitude(deg)'][0], df['height(m)'][0])
 
     df['sd(m)'] = np.sqrt(df['sdn(m)']**2+df['sde(m)']**2+df['sdu(m)']**2+df['sdne(m)']**2+df['sdeu(m)']**2+df['sdun(m)']**2)
@@ -98,11 +104,12 @@ def buildDataFrame(posFile, cntr, crs, jparams):
     
     cn = read_target(cntr, crs, jparams)
     reference = Point(cn['x'], cn['y'])
+    #print(reference)
     
-    for i in df.index :
+    for i in df.index:
         j = Point(df['x'][i], df['y'][i])
-        k = Point(cn['x'], df['y'][i])
-        l = Point(df['x'][i], cn['y'])
+        #k = Point(cn['x'], df['y'][i])
+        #l = Point(df['x'][i], cn['y'])
         
         #j = d(reference, j)#.meters
         #k = d(reference, k)#.meters#*np.sign(east)
@@ -117,7 +124,7 @@ def buildDataFrame(posFile, cntr, crs, jparams):
         k = (df['y'][i] - cn['y'])
         l = (df['x'][i] - cn['x'])
         
-        q = np.core.sqrt(j**2+m**2)
+        q = np.core.sqrt(j**2 + m**2)
         
         df['dist(m)'][i] = q
         df['deltay(m)'][i] = k
@@ -161,6 +168,31 @@ def buildDataFrame(posFile, cntr, crs, jparams):
         df1.to_csv(jparams['solution_df'], index=False)
             
     return df1
+
+def prepareAzimDF(posFile):
+    
+    inFile2 = posFile.split('_')[-1].split('.')[0]
+    inFile2 = './trace_stats/rtknavi_' + inFile2 + '.stat'
+ 
+    ### Loop the data lines
+    with open(inFile2, 'r') as temp_f:
+        # get No of columns in each line
+        col_count = [ len(l.split(",")) for l in temp_f.readlines() ]
+    
+    ### Generate column names  (names will be 0, 1, 2, ..., maximum columns - 1)
+    column_names = [i for i in range(0, max(col_count))]
+    
+    ### Read csv
+    df = pd.read_csv(inFile2, header=None, delimiter=",", names=column_names, parse_dates=[[1, 2]])
+    df.drop(df[df[0] != '$SAT'].index, inplace=True)
+    df.drop([0, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], axis=1, inplace=True)
+    df.columns = ['GPS_time', 'SV', 'freq', 'Azim', 'Elev']
+    df.reset_index(drop=True, inplace=True)
+    
+    outFile = posFile.split('/')[-1].split('.')[0]
+    #-- write df
+    df.to_csv('./sol_azim-elev/' + outFile + '.csv', sep=',', index=True, header=True)
+
 
 def convin(jparams):
 
