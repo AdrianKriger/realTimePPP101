@@ -14,6 +14,7 @@ import json
 
 import math
 import time
+import datetime as dt
 
 import numpy as np
 import pandas as pd
@@ -120,9 +121,12 @@ def prepareSolDF(posFile, cntr, crs, jparams):
         j = reference.distance(j)#.meters
         #k = reference.distance(k)#.meters#*np.sign(east)
         #l = reference.distance(l)#.meters#*np.sign(north)
-        m = (df['height(m)'][i] - cn['z'])
-        k = (df['y'][i] - cn['y'])
-        l = (df['x'][i] - cn['x'])
+        #m = (df['height(m)'][i] - cn['z'])
+        #k = (df['y'][i] - cn['y'])
+        #l = (df['x'][i] - cn['x'])
+        m = (cn['z'] - df['height(m)'][i])
+        k = (cn['y'] - df['y'][i])
+        l = (cn['x'] - df['x'][i])
         
         q = np.core.sqrt(j**2 + m**2)
         
@@ -144,19 +148,27 @@ def prepareSolDF(posFile, cntr, crs, jparams):
     #mrse = get_mrse(df['distx(m)'], df['disty(m)'], df['distz(m)'])
     mrse = get_mrse(rms_x, rms_y, rms_z)
     
+    timeD = (df['UTC'].iat[-1] - df['UTC'].iat[0])#.dt.minutes
+    print(timeD)
+    
     if jparams['write_rms'] == "True":
         with open(jparams['statistic_txt'], "w") as file:
                 #file.write(str(rms_x))
                 file.write('rms x: {}; std x: {}\nrms y: {}; std y: {}\nrms z: {}; std z: {}\
-                \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}\n\nconvergence: deltay deltax deltaz\
-                    \n30 min (1800): {} {} {}\n45 min (2700): {} {} {}\n60 min (3600): {} {} {}'.format(rms_x, std_x, 
+                \nrms 3d: {}; std 3d: {}\n\n2drms: {}\nmrse: {}\
+                    \n\nconvergence: deltay deltax deltaz\
+                    \n30 min (1800): {} {} {}\n45 min (2700): {} {} {}\n60 min (3600): {} {} {}\
+                    \n\nfinal error after {} observation:\
+                    \n {} {} {}'.format(rms_x, std_x, 
                                                                         rms_y, std_y, 
                                                                         rms_z, std_z, 
                                                                         rms_3d, std_3d,
                                                                         rms2d, mrse,
                                                                         round(df.at[1800,'deltay(m)'], 4), round(df.at[1800,'deltax(m)'], 4), round(df.at[1800,'deltaz(m)'], 4),
                                                                         round(df.at[2700,'deltay(m)'], 4), round(df.at[2700,'deltax(m)'], 4), round(df.at[2700,'deltaz(m)'], 4),
-                                                                        round(df.at[3600,'deltay(m)'], 4), round(df.at[3600,'deltax(m)'], 4), round(df.at[3600,'deltaz(m)'], 4)))
+                                                                        round(df.at[3600,'deltay(m)'], 4), round(df.at[3600,'deltax(m)'], 4), round(df.at[3600,'deltaz(m)'], 4),
+                                                                        timeD, 
+                                                                        round(df['deltay(m)'].iat[-1], 4), round(df['deltax(m)'].iat[-1], 4), round(df['deltaz(m)'].iat[-1], 4)))
         file.close()
             
     columns = ['%_GPST', 'UTC', 'latitude(deg)', 'longitude(deg)', 'height(m)', 'x', 'y', 'Q', 'ns', 
@@ -169,7 +181,7 @@ def prepareSolDF(posFile, cntr, crs, jparams):
             
     return df1
 
-def prepareAzimDF(posFile):
+def prepareAzimDF(posFile, jparams):
     
     inFile2 = posFile.split('_')[-1].split('.')[0]
     inFile2 = './trace_stats/rtknavi_' + inFile2 + '.stat'
@@ -188,6 +200,17 @@ def prepareAzimDF(posFile):
     df.drop([0, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], axis=1, inplace=True)
     df.columns = ['GPS_time', 'SV', 'freq', 'Azim', 'Elev']
     df.reset_index(drop=True, inplace=True)
+    
+    #-- UTC
+    df['Gw'] = df['GPS_time'].apply(lambda x: x.split(' ')[0])
+    df['Gs'] = df['GPS_time'].apply(lambda x: x.split(' ')[1])
+    #df['UTC'] = UTCFromGps(df['Gw'], df['Gs'], leapSecs=14):
+    #print(df['Gs'])
+    UTC = df.apply(lambda row: UTCFromGps(float(row['Gw']), float(row['Gs']), leapSecs=jparams['gps-leapSec']), axis = 1)
+    # df.insert() to add a column
+    df.insert(1, "UTC", UTC, True)
+    # datetime
+    df['UTC'] = pd.to_datetime(df['UTC'])
     
     outFile = posFile.split('/')[-1].split('.')[0]
     #-- write df
