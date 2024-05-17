@@ -1,2 +1,2 @@
 
-data for the SRV370S practical 
+data for the SRV370S Satellite Surveying practical 
