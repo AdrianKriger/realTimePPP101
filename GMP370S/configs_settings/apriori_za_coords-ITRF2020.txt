@@ -1,0 +1,22 @@
+#
+# Apriori coordinates with eccentricities, antennas and receivers ~~ !!! eccentricities need to be verified !!!
+#------------------------------------------------------------------------------------------------------------
+#from TrigNet  >>> irtf2014 epoch 2018.18 ~~ ftp://ftp.trignet.co.za/
+#Ctwn-SB	33	57	05.1590	S	18	28	06.7889	E	83.598	0.0000	0.0000	0.0000	TRM59800.00	SCIS_TRIMBLE_NETR9
+
+### BROADCAST: the data that comes, with the GNSS observations, when you access the site; typically under station info ###
+#Ctwn-SB	-33.95143306	18.46855246	83.597	0.0000	0.0000	0.0000	TRM59800.00	SCIS	TRIMBLE_NETR9
+
+###--- DEFINED: ECEF irtf2014 (2010.00) from itrf -> https://igs.org/network/ ###
+#Ctwn-SB	5023564.462	1677795.751	-3542025.865	0.0000	0.0000	0.0000	TRM59800.00	SCIS	TRIMBLE_NETR9  ---this is JCTW00ZAF domes 30305M001 
+
+
+
+
+
+
+###--- DEFINED: ECEF irtf2020 (2015.00)[https://itrf.ign.fr/ftp/pub/itrf/itrf2020/ITRF2020_GNSS.SSC.txt] ###
+#JCTW00ZAF	5023564.4696  1677795.7313 -3542025.8896
+
+###--- coverted ecef [https://itrf.ign.fr/ftp/pub/itrf/itrf2020/ITRF2020_GNSS.SSC.txt] to llh ###
+CTWN00ZAF0	-33.95143357	18.46855188	83.610	0.0000	0.0000	0.0000	TRM59800.00	SCIS	TRIMBLE_NETR9  ---this is JCTW00ZAF domes 30305M001
