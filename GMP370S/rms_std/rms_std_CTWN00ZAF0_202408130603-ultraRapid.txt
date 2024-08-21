@@ -1,0 +1,15 @@
+rms x: 0.9352; std x: 0.872
+rms y: 1.014; std y: 0.9718
+rms z: 1.4546; std z: 2.0669                
+rms 3d: 1.538; std 3d: 2.3583
+
+2drms: 2.7588
+mrse: 2.0047                    
+
+convergence: deltay deltax deltaz                    
+30 min (1800): -0.1405 0.4941 -2.406
+45 min (2700): -0.7732 -1.0214 1.1752
+60 min (3600): -1.4264 1.6312 0.9784                    
+
+final error after 0 days 06:01:57 observation:                    
+ -0.5097 -1.0218 -1.7857
