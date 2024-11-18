@@ -25,7 +25,7 @@ import shapely.geometry
 
 import matplotlib.dates as md
 
-from gmp370sUtils import UTCFromGps, d2, get_rms2d, get_mrse, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
+from gmp370sUtils import UTCFromGps, d2, get_rms2d, get_mrse, get_rms2d2, get_mrse2, move_debug, std_errorDist, pos_errorDist, pos_Convg, decimalDegree
 
 
 def readTarget(cntr, crs, jparams):
@@ -115,8 +115,11 @@ def prepareSolDF(posFile, cntr, crs, jparams):
     [rms_3d, std_3d] = d2(df.xyz, df['Rxyz'])
 
     
-    rms2d = get_rms2d(rms_x, rms_y)
-    mrse = get_mrse(rms_x, rms_y, rms_z)
+    #rms2d = get_rms2d(rms_x, rms_y)
+    #mrse = get_mrse(rms_x, rms_y, rms_z)
+    
+    rms2d2 = get_rms2d2(df.x, df.cx, df.y, df.cy)
+    mrse2 = get_mrse2(df.x, df.cx, df.y, df.cy, df['height(m)'], df.cz)
     
     if jparams['write_rms'] == "True":
         with open(jparams['statistic_txt'], "w") as file:
@@ -130,7 +133,7 @@ def prepareSolDF(posFile, cntr, crs, jparams):
                                                                         rms_y, std_y, 
                                                                         rms_z, std_z, 
                                                                         rms_3d, std_3d,
-                                                                        rms2d, mrse,
+                                                                        rms2d2, mrse2,
                                                                         round(df.at[1800,'deltay(m)'], 4), round(df.at[1800,'deltax(m)'], 4), round(df.at[1800,'deltaz(m)'], 4),
                                                                         round(df.at[2700,'deltay(m)'], 4), round(df.at[2700,'deltax(m)'], 4), round(df.at[2700,'deltaz(m)'], 4),
                                                                         #round(df.at[3600,'deltay(m)'], 4), round(df.at[3600,'deltax(m)'], 4), round(df.at[3600,'deltaz(m)'], 4),

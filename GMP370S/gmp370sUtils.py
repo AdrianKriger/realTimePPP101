@@ -38,9 +38,7 @@ def d2(df, target):
 
 def get_rms2d(rms_x, rms_y):
     
-    # Twice the DRMS of the horizontal position errors, defining the radius of a circle centered at the 
-    # true position, containing the horizontal position estimate with a probability of 95 %.
-    # - https://gnss-sdr.org/design-forces/accuracy/ | https://gssc.esa.int/navipedia/index.php/Positioning_Error
+    # traditional distance root mean squared error - axis specific
     
     drms2 = round(2 * math.sqrt(rms_x**2 + rms_y**2), 4)
 
@@ -48,13 +46,48 @@ def get_rms2d(rms_x, rms_y):
 
 def get_mrse(rms_x, rms_y, rms_z):
     
-    # The radius of a sphere centered at the true position, containing the position estimate in 3D with a 
-    # probability of 61 %.
-    # - https://gnss-sdr.org/design-forces/accuracy/ | https://gssc.esa.int/navipedia/index.php/Positioning_Error
+    # traditional 3D root mean squared error - axis specific
     
     mrse = round(math.sqrt(rms_x**2 + rms_y**2 + rms_z**2), 4)
 
     return mrse
+
+def get_rms2d2(measured_x, target_x, measured_y, target_y):
+
+    # technically more rigorous
+    
+    # Twice the DRMS of the horizontal position errors, defining the radius of a circle centered at the 
+    # true position, containing the horizontal position estimate with a probability of 95 %.
+    # - https://gnss-sdr.org/design-forces/accuracy/ | https://gssc.esa.int/navipedia/index.php/Positioning_Error
+        
+    # Squaring the sum of differences between columns without looping
+    squared_sum = [(measured_x - target_x)**2 + 
+                   (measured_y - target_y)**2]
+    
+    # Summing across all rows
+    rms2d2 = math.sqrt(1/len(measured_x) * (np.asarray(squared_sum).sum()))
+    
+    return rms2d2
+
+def get_mrse2(measured_x, target_x, measured_y, target_y, measured_z, target_z):
+    
+    # technically more rigorous
+
+    # The radius of a sphere centered at the true position, containing the position estimate in 3D with a 
+    # probability of 61 %.
+    # - https://gnss-sdr.org/design-forces/accuracy/ | https://gssc.esa.int/navipedia/index.php/Positioning_Error
+        
+    #mrse = mean_squared_error(measured, [target for _ in measured], squared=False)
+    # Squaring the sum of differences between columns without looping
+    squared_sum = [(measured_x - target_x)**2 + 
+                   (measured_y - target_y)**2 +
+                   (measured_z - target_z)**2]
+    
+    # Summing across all rows
+    mrse = math.sqrt(1/len(measured_x) * (np.asarray(squared_sum).sum()))
+
+    return mrse
+
 
 def UTCFromGps(gpsWeek, SOW, leapSecs):
     
